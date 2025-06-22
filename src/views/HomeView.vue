@@ -13,14 +13,12 @@ const qrCodeDataUrl = ref('');
 async function generatePdf() {
   const cvElement = document.getElementById('cv-preview');
   if (cvElement) {
+    const originalStyle = cvElement.getAttribute('style') || '';
     const styleId = 'pdf-print-styles';
-    // Create a new <style> element to inject our print-specific CSS
+    
+    // Create a temporary style element to inject letter-spacing rules
     const style = document.createElement('style');
     style.id = styleId;
-    
-    // This CSS rule targets the container and ALL elements within it (*).
-    // This ensures our spacing rules are applied uniformly to all text,
-    // including headers, paragraphs, and bold text, overriding other styles.
     style.innerHTML = `
       #cv-preview, #cv-preview * {
         font-family: Arial, Helvetica, sans-serif !important;
@@ -28,30 +26,51 @@ async function generatePdf() {
         word-spacing: 1pt !important;
       }
     `;
-
-    // Add the temporary styles to the document's head
     document.head.appendChild(style);
+    
+    // Temporarily set height to auto to capture the full content
+    cvElement.style.height = 'auto';
+    cvElement.style.overflow = 'visible';
 
     try {
-      // Now, html2canvas will render the component using our temporary styles
       const canvas = await html2canvas(cvElement, {
-        scale: 3, // Higher scale for better quality
+        scale: 3,
         useCORS: true,
         logging: true,
         backgroundColor: '#ffffff',
+        windowHeight: cvElement.scrollHeight,
       });
 
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
       
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      
+      const ratio = imgWidth / pdfWidth;
+      const totalPdfHeight = imgHeight / ratio;
+
+      let heightLeft = totalPdfHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, totalPdfHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft > 0) {
+        position = -pageHeight + position;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, totalPdfHeight);
+        heightLeft -= pageHeight;
+      }
+
       pdf.save('cv.pdf');
 
     } finally {
-      // IMPORTANT: Remove the temporary style element after we're done
-      // to restore the original on-screen appearance.
+      // Restore original styles and remove the temporary stylesheet
+      cvElement.setAttribute('style', originalStyle);
       const styleElement = document.getElementById(styleId);
       if (styleElement) {
         styleElement.remove();

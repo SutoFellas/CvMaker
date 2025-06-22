@@ -5,7 +5,7 @@ import type { Experience, Education, Certificate } from '@/stores/cv';
 
 const props = defineProps({
   profile: Object as PropType<{ name: string; title: string; picture: string; }>,
-  contact: Object as PropType<{ linkedin: string; email: string; phone: string; website: string; }>,
+  contact: Object as PropType<{ linkedin: string; email: string; phone: string; website: string; portfolio: string; }>,
   skills: Array as PropType<string[]>,
   experiences: Array as PropType<Experience[]>,
   educations: Array as PropType<Education[]>,
@@ -13,6 +13,42 @@ const props = defineProps({
 });
 
 const store = useCvStore();
+
+// Helper function to format date
+const formatDate = (dateString: string) => {
+  if (!dateString) return 'Halen';
+  const date = new Date(dateString);
+  const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long' };
+  return new Intl.DateTimeFormat('tr-TR', options).format(date);
+};
+
+// Helper function to calculate duration
+const calculateDuration = (startDate: string, endDate: string) => {
+  if (!startDate) return '';
+  const start = new Date(startDate);
+  const end = endDate ? new Date(endDate) : new Date(); // If no end date, assume "Present"
+
+  let years = end.getFullYear() - start.getFullYear();
+  let months = end.getMonth() - start.getMonth();
+
+  if (months < 0) {
+    years--;
+    months += 12;
+  }
+  
+  if (years === 0 && months === 0) return '';
+
+  let durationString = '';
+  if (years > 0) {
+    durationString += `${years} yıl`;
+  }
+  if (months > 0) {
+    if (years > 0) durationString += ', ';
+    durationString += `${months} ay`;
+  }
+
+  return `(${durationString})`;
+};
 
 const cvProfile = props.profile || store.profile;
 const cvContact = props.contact || store.contact;
@@ -60,10 +96,16 @@ const cvCertificates = props.certificates || store.certificates;
             </svg>
             <span>{{ cvContact.website }}</span>
           </li>
+          <li v-if="cvContact.portfolio && cvContact.portfolio.trim()">
+            <svg class="contact-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/>
+            </svg>
+            <span>{{ cvContact.portfolio }}</span>
+          </li>
         </ul>
       </div>
 
-      <div class="skills-section" v-if="cvSkills && cvSkills.filter(skill => skill.trim()).length > 0">
+      <div class="skills-section" v-if="cvSkills && cvSkills.filter((skill: string) => skill.trim()).length > 0">
         <h3>İLGİLİ BECERİLER</h3>
         <ul>
           <li v-for="(skill, index) in cvSkills" :key="index">
@@ -73,21 +115,24 @@ const cvCertificates = props.certificates || store.certificates;
       </div>
     </aside>
     <main class="main-content">
-      <section class="cv-section" v-if="cvExperiences && cvExperiences.filter(exp => exp.title.trim() || exp.company.trim() || exp.dates.trim() || exp.description.some(d => d.trim())).length > 0">
+      <section class="cv-section" v-if="cvExperiences && cvExperiences.filter((exp: Experience) => exp.title.trim() || exp.company.trim() || exp.startDate.trim() || exp.description.some((d: string) => d.trim())).length > 0">
         <h2 class="section-title">İŞ DENEYİMİ</h2>
         <div v-for="(exp, index) in cvExperiences" :key="index" class="entry">
           <div class="entry-header">
             <h3 class="entry-title">{{ exp.title }}</h3>
             <div class="entry-subtitle">{{ exp.company }}</div>
           </div>
-          <div class="entry-meta">{{ exp.dates }}</div>
+          <div class="entry-meta">
+            {{ formatDate(exp.startDate) }} - {{ formatDate(exp.endDate) }}
+            <span v-if="exp.startDate" class="duration">{{ calculateDuration(exp.startDate, exp.endDate) }}</span>
+          </div>
           <ul class="entry-description">
             <li v-for="(desc, descIndex) in exp.description" :key="descIndex">{{ desc }}</li>
           </ul>
         </div>
       </section>
 
-      <section class="cv-section" v-if="cvEducations && cvEducations.filter(edu => edu.degree.trim() || edu.school.trim() || edu.year.trim() || edu.details.some(d => d.trim())).length > 0">
+      <section class="cv-section" v-if="cvEducations && cvEducations.filter((edu: Education) => edu.degree.trim() || edu.school.trim() || edu.year.trim() || edu.details.some((d: string) => d.trim())).length > 0">
         <h2 class="section-title">EĞİTİM GEÇMİŞİ</h2>
         <div v-for="(edu, index) in cvEducations" :key="index" class="entry">
           <div class="entry-header">
@@ -101,7 +146,7 @@ const cvCertificates = props.certificates || store.certificates;
         </div>
       </section>
 
-      <section class="cv-section" v-if="cvCertificates && cvCertificates.filter(c => c.name.trim() || c.organization.trim() || c.year.trim()).length > 0">
+      <section class="cv-section" v-if="cvCertificates && cvCertificates.filter((c: Certificate) => c.name.trim() || c.organization.trim() || c.year.trim()).length > 0">
         <h2 class="section-title">SERTİFİKALAR</h2>
         <template v-for="(cert, index) in cvCertificates" :key="index">
           <div class="entry" v-if="cert.name.trim() || cert.organization.trim() || cert.year.trim()">
@@ -289,6 +334,11 @@ const cvCertificates = props.certificates || store.certificates;
   color: #555;
   margin-bottom: 0.75rem;
   line-height: 1.3;
+}
+
+.duration {
+  margin-left: 0.5rem;
+  font-style: italic;
 }
 
 .entry-description {

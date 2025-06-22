@@ -36,7 +36,8 @@ function addExperience() {
   store.experiences.push({
     title: '',
     company: '',
-    dates: '',
+    startDate: '',
+    endDate: '',
     description: ['']
   });
 }
@@ -172,6 +173,17 @@ function deleteContact(type: 'linkedin' | 'email' | 'phone' | 'website' | 'portf
                 </button>
               </div>
             </div>
+            <div class="form-row">
+              <label for="portfolio">Portfolyo</label>
+              <div class="input-with-delete">
+                <input type="text" id="portfolio" v-model="store.contact.portfolio">
+                <button type="button" class="delete-btn" @click="deleteContact('portfolio')" title="Portfolyoyu sil">
+                  <svg class="delete-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </fieldset>
@@ -208,9 +220,15 @@ function deleteContact(type: 'linkedin' | 'email' | 'phone' | 'website' | 'portf
                 <label :for="'exp-company-' + expIndex">Şirket</label>
                 <input :id="'exp-company-' + expIndex" type="text" v-model="experience.company">
               </div>
-              <div class="form-row">
-                <label :for="'exp-dates-' + expIndex">Tarihler</label>
-                <input :id="'exp-dates-' + expIndex" type="text" v-model="experience.dates">
+              <div class="form-row split-2">
+                <div>
+                  <label :for="'exp-start-date-' + expIndex">Başlangıç Tarihi</label>
+                  <input :id="'exp-start-date-' + expIndex" type="date" v-model="experience.startDate">
+                </div>
+                <div>
+                  <label :for="'exp-end-date-' + expIndex">Bitiş Tarihi</label>
+                  <input :id="'exp-end-date-' + expIndex" type="date" v-model="experience.endDate">
+                </div>
               </div>
               
               <label class="area-label">Açıklamalar</label>
@@ -370,20 +388,6 @@ legend:hover {
   overflow: hidden;
 }
 
-label {
-  font-weight: 500;
-  color: #555;
-  flex: 0 0 120px;
-  text-align: left;
-}
-
-.area-label {
-  flex-basis: auto;
-  text-align: left;
-  margin-bottom: -0.25rem;
-  margin-top: 0.5rem;
-}
-
 .form-row {
   display: flex;
   align-items: center;
@@ -395,8 +399,30 @@ label {
   margin-bottom: 0;
 }
 
-.form-row input {
-  flex-grow: 1;
+.form-row label {
+  flex: 0 0 120px;
+  font-weight: 500;
+}
+
+.form-row input[type="text"],
+.form-row input[type="file"],
+.form-row .input-with-delete {
+  flex: 1;
+}
+
+.form-row.split-2 {
+  align-items: flex-start;
+}
+
+.form-row.split-2 > div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-row.split-2 > div label {
+  margin-bottom: 0.2rem;
+  width: 100%;
 }
 
 input[type="text"],

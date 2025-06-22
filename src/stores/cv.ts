@@ -4,7 +4,8 @@ import { defineStore } from 'pinia'
 export interface Experience {
   title: string;
   company: string;
-  dates: string;
+  startDate: string;
+  endDate: string;
   description: string[];
 }
 
@@ -23,60 +24,81 @@ export interface Certificate {
 
 export const useCvStore = defineStore('cv', () => {
   const profile = ref({
-    name: 'KAAN GERDANLI',
-    title: 'UÇUŞ GÖREVLİSİ',
-    picture: '',
+    name: 'Süleyman Gürbüz',
+    title: 'Yazılım Mühendisi',
+    picture: '', // Fotoğraf URL'n varsa buraya ekleyebilirsin
   })
-
+  
   const contact = ref({
-    linkedin: 'linkedin.com/in/isim',
-    email: 'merhaba@harikasite.web.tr',
-    phone: '+123-456-7890',
-    website: 'www.harikasite.web.tr',
-    portfolio: 'Portföyüm için buraya tıklayın'
+    linkedin: 'https://linkedin.com/in/suleymangurbuz',
+    email: 'sutofellas@sutofellas.com',
+    phone: '+90 532 222 22 22',
+    website: 'https://sutofellas.space',
+    portfolio: 'https://sutofellas.space/projects'
   })
-
+  
   const skills = ref([
-    'Akıcı Fransızca',
-    'Kaliteli Müşteri Hizmetleri',
-    'İlk Yardım ve Acil Bakım',
+    'Full Stack Developer',
+    'JavaScript / TypeScript',
+    'Vue 3 / React',
+    'Node.js & Express.js',
+    'WebSocket & Real-time Uygulamalar',
+    'Firebase & MongoDB',
+    'Mobil Geliştirme (React Native)',
+    'UI/UX Tasarımı',
+    
+   
+   
   ])
-
+  
   const experiences = ref<Experience[]>([
     {
-      title: 'Uçuş Görevlisi',
-      company: 'Willfred Havayolları',
-      dates: 'Mart 2022 - Ağustos 2025 (3 yıl, 5 ay)',
+      title: 'Yazılım Mühendisi',
+      company: 'Noa Yazılım',
+      startDate: '2025-06-01',
+      endDate: '2025-08-31',
       description: [
-        '40\'tan fazla genç uçuş görevlisine danışmanlık yaparak ve onları yüksek kaliteli sağlık ve güvenlik standartlarında eğiterek genel hizmet kalitesini %30 artırdı',
-        'Onlara olağanüstü müşteri odaklı hizmet sunarak ve konfor ve güvenliklerini sağlayarak %100 olumlu geri bildirim notu korundu',
-        '2.000 saatten fazla uluslararası ve iç hat uçuşu gerçekleştirildi',
+        'HTML, CSS ve JavaScript kullanarak müşteri arayüzleri tasarladı ve geliştirdi.',
+        
+        'Kullanıcı deneyimini iyileştirmek için mobil uyumlu ve erişilebilir tasarımlar geliştirdi.'
+      ],
+    },
+    {
+      title: 'Freelance Full Stack Developer',
+      company: 'Kendi Projem',
+      startDate: '2023-01-01',
+      endDate: '2025-06-01',
+      description: [
+        'Üniversite otobüs takip sistemi geliştirildi; sürücü mobil uygulaması (React Native), gerçek zamanlı harita arayüzü (Vue + Leaflet) ve Node.js backend kullanıldı.',
+        'Firebase Realtime Database ve WebSocket ile canlı konum takibi sağlandı.',
+        'Tamamen mobil/tablet/masaüstü uyumlu arayüz tasarlandı ve sunumlar için teknik dokümantasyon hazırlandı.'
       ],
     },
   ])
-
+  
   const educations = ref<Education[]>([
     {
-      degree: 'Turizm Bilimi Lisans',
-      school: 'Vadiköy Üniversitesi',
-      year: 'Mezuniyet Yılı: 2020',
-      details: ['Cum Laude Başkanı', 'En İyi Tez', 'Vadiköy Münazara Kulübü'],
+      degree: 'Yazılım Mühendisliği Lisans',
+      school: 'Girne Üniversitesi',
+      year: '2025',
+      details: [
+        'Bitirme Projesi: Gerçek Zamanlı Üniversite Otobüs Takip Sistemi',
+        'Leaflet, Google API ve Firebase kullanımı üzerine araştırmalar'
+      ],
     },
+    
   ])
-
+  
   const certificates = ref<Certificate[]>([
+  
     {
-      name: 'Uçuş Güvenliği Eğitimi',
-      organization: 'Ulusal Havacılık Derneği',
-      year: '2020',
+      name: 'Web Geliştirme Uzmanlığı',
+      organization: 'Google Developers Türkiye',
+      year: '2023',
     },
-    {
-      name: 'İlk Yardım Sertifikası Kurumu:',
-      organization: 'Uluslararası Tıp Ajansı',
-      year: '2020',
-    },
+  
   ])
-
+  
   function updateName(name: string) {
     profile.value.name = name;
   }

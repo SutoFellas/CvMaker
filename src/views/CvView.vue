@@ -14,6 +14,7 @@ interface CvData {
     email: string;
     phone: string;
     website: string;
+    portfolio: string;
   };
   skills: string[];
   experiences: Experience[];
